@@ -1,18 +1,21 @@
 Oidc.Log.logger = console;
 Oidc.Log.level = Oidc.Log.DEBUG;
 
-console.log(`Using oidc-client version: ${Oidc.Version}`);
+console.log(`--> Using oidc-client version: ${Oidc.Version}`);
 
 AWS.config.region = 'us-east-1';
 // console.log(`Using AWS SDK version: XXX`);
 
-const mgr = new Oidc.UserManager(oidcConfig);
+// spaOidcConfig.userStore = new Oidc.WebStorageStateStore({prefix: 'spaOidc.', store: Oidc.Global.sessionStore});
+// awsOidcConfig.userStore = new Oidc.WebStorageStateStore({prefix: 'awsOidc.', store: Oidc.Global.sessionStore});
+
+const mgr = new Oidc.UserManager(spaOidcConfig);
 
 const login = () => mgr.signinRedirect();
 const logout = () => mgr.signoutRedirect();
 
 const logUser = (user) => {
-    console.log(JSON.stringify(user));
+    console.log(`--> User: ${JSON.stringify(user)}`);
     return user;
 }
 
@@ -26,31 +29,39 @@ const showUserInfo = (user) => {
     return user;
 }
 
-const showAwsCallerIdentity = (user) => {
+const showAwsCallerIdentity = (spaUser) => {
     const awsInfo = document.getElementById('aws');
-    awsInfo.hidden = !user;
+    awsInfo.hidden = !spaUser;
 
-    if (user) {
-        if (!AWS.config.credentials || AWS.config.credentials.expired) {
-            AWS.config.credentials = new AWS.WebIdentityCredentials({
-                RoleArn: 'arn:aws:iam::TBD:role/aws_spa_oauth',
-                WebIdentityToken: user.access_token,
-                RoleSessionName: user.profile.email
-            });
-            console.log(`AWS creds: ${JSON.stringify(AWS.config.credentials)}`);
-        }
-
-        const sts = new AWS.STS();
-        sts.getCallerIdentity({}, (err, data) => {
-            if (err) {
-                console.log(err, err.stack);
-            } else {
-                awsInfo.innerHTML = JSON.stringify(data);
-            }
-        })
+    if (!spaUser) {
+        return undefined;
     }
 
-    return user;
+    console.log(`--> AWS creds before: ${JSON.stringify(AWS.config.credentials)}`);
+
+    const awsOidcMgr = new Oidc.UserManager(awsOidcConfig);
+
+    awsOidcMgr.signinSilent().then(awsUser => {
+        console.log(`--> awsUser: ${awsUser}`);
+        AWS.config.credentials = new AWS.WebIdentityCredentials({
+            RoleArn: 'arn:aws:iam::520400067019:role/aws_spa_oauth',
+            WebIdentityToken: awsUser.access_token,
+            RoleSessionName: awsUser.profile.email
+        });
+        console.log(`--> AWS creds: ${JSON.stringify(AWS.config.credentials)}`);
+    }).catch(console.error);
+
+
+    // const sts = new AWS.STS();
+    // sts.getCallerIdentity({}, (err, data) => {
+    //     if (err) {
+    //         console.log(err, err.stack);
+    //     } else {
+    //         awsInfo.innerHTML = JSON.stringify(data);
+    //     }
+    // })
+
+    return spaUser;
 }
 
 document.getElementById('login').addEventListener("click", login, false);

@@ -10,14 +10,22 @@ const static = express.static(path.join(__dirname, 'public'))
 app.use(static)
 
 app.get('/oidc-config.js', (req, res) => {
-    res.set('Content-Type', 'application/javascript')
-    res.send(`oidcConfig = ${JSON.stringify({
+    const spaOidcConfig = JSON.stringify({
         authority: process.env['ISSUER_BASE_URL'],
-        client_id: process.env['CLIENT_ID'],
+        client_id: process.env['SPA_CLIENT_ID'],
         redirect_uri: `${process.env['BASE_URL']}/callback.html`,
-        post_logout_redirect_uri: process.env['BASE_URL'],
+        post_logout_redirect_uri: `${process.env['BASE_URL']}/`,
         response_type: 'code'
-    })}`)
+    })
+    const awsOidcConfig = JSON.stringify({
+        authority: process.env['ISSUER_BASE_URL'],
+        client_id: process.env['AWS_CLIENT_ID'],
+        silent_redirect_uri: `${process.env['BASE_URL']}/callback-silent.html`,
+        post_logout_redirect_uri: `${process.env['BASE_URL']}/`,
+        response_type: 'code'
+    })
+    res.set('Content-Type', 'application/javascript')
+    res.send(`spaOidcConfig = ${spaOidcConfig};\nawsOidcConfig = ${awsOidcConfig};`)
 })
 
 app.listen(port, () => {
