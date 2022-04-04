@@ -16,6 +16,15 @@ services:
       - postgresql
     ports:
       - "8080:8080"
+      - "443:8443"
+    environment:
+      - KEYCLOAK_ENABLE_TLS=true
+      - KEYCLOAK_TLS_KEYSTORE_FILE=/opt/bitnami/keycloak/certs/keystore.jks
+      - KEYCLOAK_TLS_KEYSTORE_PASSWORD=secret
+      - KEYCLOAK_TLS_TRUSTSTORE_FILE=/opt/bitnami/java/lib/security/cacerts
+      - KEYCLOAK_TLS_TRUSTSTORE_PASSWORD=changeit
+    volumes:
+      - ./keystore.jks:/opt/bitnami/keycloak/certs/keystore.jks
 
 volumes:
   postgresql_data:
