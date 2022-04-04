@@ -5,17 +5,13 @@
     </head>
     <body>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/oidc-client/1.11.5/oidc-client.min.js"></script>
+        <script src="oidc-config.js"></script>
         <script>
-            var mgr = new Oidc.UserManager();
+            var mgr = new Oidc.UserManager(oidcConfig);
             mgr.signinRedirectCallback().then(() => {
                 console.log(`signinRedirectCallback done`);
-                window.history.replaceState({},
-                    window.document.title,
-                    window.location.origin);
                 window.location = "/";
-            }, error => {
-                console.error(error);
-            });
+            }).catch(console.error);
         </script>
     </body>
 </html>

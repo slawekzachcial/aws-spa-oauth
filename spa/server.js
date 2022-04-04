@@ -15,6 +15,7 @@ app.get('/oidc-config.js', (req, res) => {
         authority: process.env['ISSUER_BASE_URL'],
         client_id: process.env['CLIENT_ID'],
         redirect_uri: `${process.env['BASE_URL']}/callback.html`,
+        post_logout_redirect_uri: process.env['BASE_URL'],
         response_type: 'code'
     })}`)
 })

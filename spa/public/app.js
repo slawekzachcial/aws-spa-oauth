@@ -6,40 +6,22 @@ Oidc.Log.level = Oidc.Log.DEBUG;
 
 console.log(`Using oidc-client version: ${Oidc.Version}`);
 
-function greetUser(email) {
-    const userUnknown = !email;
-    const greeting = userUnknown ? 'Hello stranger!' : `Hello ${email}!`;
+function greetUser(user) {
+    console.log(JSON.stringify(user));
+    const greeting = user ? `Hello, ${user.profile.email}!` : `Hello, Stranger!`;
     document.getElementById('greeting').innerHTML = greeting;
-    document.getElementById('login').hidden = !userUnknown;
-    document.getElementById('logout').hidden = userUnknown;
+    document.getElementById('login').hidden = !!user;
+    document.getElementById('logout').hidden = !user;
 }
-
-// greetUser();
 
 const mgr = new Oidc.UserManager(oidcConfig);
 
-// mgr.signinRedirectCallback().then(user => {
-//     greetUser(user.email);
-// }).catch(err => { console.log(err); });
-
-
-mgr.events.addUserLoaded(user => {
-    console.log(`User loaded: ${user.email}`);
-    greetUser(user.email);
-});
-mgr.events.addUserUnloaded(e => { greetUser(); });
+mgr.getUser().then(greetUser).catch(console.error);
 
 function login() {
-    const someState = { message: 'some data' };
-    mgr.signinRedirect({ state: someState, useReplaceToNavigate: true }).then(() => {
-        console.log('signinRedirect done');
-    }).catch(err => { console.error(err); });
-    // mgr.signinSilent({state:'some data'}).then(user => {
-    //     greetUser(user.email);
-    // }).catch(err => {
-    //     console.log(err);
-    // });
+    mgr.signinRedirect();
 }
 
 function logout() {
+    mgr.signoutRedirect();
 }
