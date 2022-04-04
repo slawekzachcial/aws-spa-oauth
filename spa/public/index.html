@@ -5,9 +5,14 @@
     </head>
     <body>
         <p id="greeting"></p>
-        <div id="auth"><a href="#" id="login">Login</a><a href="#" id="logout">Logout</a></div>
+        <div>
+            <a href="#" id="login">Login</a>
+            <a href="#" id="logout">Logout</a>
+        </div>
+        <p id="aws">Caller identity goes here</p>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/oidc-client/1.11.5/oidc-client.min.js"></script>
+        <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1106.0.min.js"></script>
         <script src="oidc-config.js"></script>
         <script src="app.js"></script>
     </body>
