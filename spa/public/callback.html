@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SPA with OIDC and AWS</title>
+    </head>
+    <body>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/oidc-client/1.11.5/oidc-client.min.js"></script>
+        <script>
+            var mgr = new Oidc.UserManager();
+            mgr.signinRedirectCallback().then(() => {
+                console.log(`signinRedirectCallback done`);
+                window.history.replaceState({},
+                    window.document.title,
+                    window.location.origin);
+                window.location = "/";
+            }, error => {
+                console.error(error);
+            });
+        </script>
+    </body>
+</html>
+

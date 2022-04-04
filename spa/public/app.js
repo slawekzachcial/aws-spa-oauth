@@ -14,23 +14,26 @@ function greetUser(email) {
     document.getElementById('logout').hidden = userUnknown;
 }
 
-greetUser();
+// greetUser();
 
 const mgr = new Oidc.UserManager(oidcConfig);
 
-mgr.signinRedirectCallback().then(user => {
+// mgr.signinRedirectCallback().then(user => {
+//     greetUser(user.email);
+// }).catch(err => { console.log(err); });
+
+
+mgr.events.addUserLoaded(user => {
+    console.log(`User loaded: ${user.email}`);
     greetUser(user.email);
-}).catch(err => { console.log(err); });
-
-
-mgr.events.addUserLoaded(user => { greetUser(user.email); });
+});
 mgr.events.addUserUnloaded(e => { greetUser(); });
 
 function login() {
     const someState = { message: 'some data' };
     mgr.signinRedirect({ state: someState, useReplaceToNavigate: true }).then(() => {
         console.log('signinRedirect done');
-    }).catch(err => { console.log(err); });
+    }).catch(err => { console.error(err); });
     // mgr.signinSilent({state:'some data'}).then(user => {
     //     greetUser(user.email);
     // }).catch(err => {

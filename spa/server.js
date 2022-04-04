@@ -14,8 +14,8 @@ app.get('/oidc-config.js', (req, res) => {
     res.send(`oidcConfig = ${JSON.stringify({
         authority: process.env['ISSUER_BASE_URL'],
         client_id: process.env['CLIENT_ID'],
-        redirect_uri: process.env['BASE_URL'],
-        response_code: 'code'
+        redirect_uri: `${process.env['BASE_URL']}/callback.html`,
+        response_type: 'code'
     })}`)
 })
 
