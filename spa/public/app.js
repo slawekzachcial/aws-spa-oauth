@@ -39,27 +39,40 @@ const showAwsCallerIdentity = (spaUser) => {
 
     console.log(`--> AWS creds before: ${JSON.stringify(AWS.config.credentials)}`);
 
-    const awsOidcMgr = new Oidc.UserManager(awsOidcConfig);
+    AWS.config.credentials = new AWS.WebIdentityCredentials({
+        RoleArn: 'arn:aws:iam::520400067019:role/aws_spa_oauth',
+        WebIdentityToken: spaUser.id_token,
+        RoleSessionName: spaUser.profile.email
+    });
+    console.log(`--> AWS creds: ${JSON.stringify(AWS.config.credentials)}`);
+    // const awsOidcMgr = new Oidc.UserManager(awsOidcConfig);
 
-    awsOidcMgr.signinSilent().then(awsUser => {
-        console.log(`--> awsUser: ${awsUser}`);
-        AWS.config.credentials = new AWS.WebIdentityCredentials({
-            RoleArn: 'arn:aws:iam::520400067019:role/aws_spa_oauth',
-            WebIdentityToken: awsUser.access_token,
-            RoleSessionName: awsUser.profile.email
-        });
-        console.log(`--> AWS creds: ${JSON.stringify(AWS.config.credentials)}`);
-    }).catch(console.error);
+    // awsOidcMgr.signinSilent().then(awsUser => {
+    //     console.log(`--> awsUser: ${awsUser}`);
+    //     AWS.config.credentials = new AWS.WebIdentityCredentials({
+    //         RoleArn: 'arn:aws:iam::520400067019:role/aws_spa_oauth',
+    //         WebIdentityToken: awsUser.access_token,
+    //         RoleSessionName: awsUser.profile.email
+    //     });
+    //     console.log(`--> AWS creds: ${JSON.stringify(AWS.config.credentials)}`);
+    // }).catch(console.error);
 
 
-    // const sts = new AWS.STS();
-    // sts.getCallerIdentity({}, (err, data) => {
-    //     if (err) {
-    //         console.log(err, err.stack);
-    //     } else {
-    //         awsInfo.innerHTML = JSON.stringify(data);
-    //     }
-    // })
+    AWS.config.credentials.get(err => {
+        if (err) {
+            console.error(err);
+        } else {
+            console.log(`--> AWS creds2: ${JSON.stringify(AWS.config.credentials)}`);
+            const sts = new AWS.STS();
+            sts.getCallerIdentity({}, (err, data) => {
+                if (err) {
+                    console.log(err, err.stack);
+                } else {
+                    awsInfo.innerHTML = JSON.stringify(data);
+                }
+            })
+        }
+    })
 
     return spaUser;
 }

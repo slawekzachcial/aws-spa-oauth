@@ -16,7 +16,8 @@ variable "oidc_issuer_thumbprint" {
 }
 
 variable "oidc_client_id" {
-  default = "aws-personal"
+  # default = "aws-personal"
+  default = "express-oauth-aws"
 }
 
 variable "tags" {
