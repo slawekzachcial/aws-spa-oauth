@@ -9,13 +9,30 @@ AWS.config.region = 'us-east-1';
 // spaOidcConfig.userStore = new Oidc.WebStorageStateStore({prefix: 'spaOidc.', store: Oidc.Global.sessionStore});
 // awsOidcConfig.userStore = new Oidc.WebStorageStateStore({prefix: 'awsOidc.', store: Oidc.Global.sessionStore});
 
+JSON.safeStringify = (obj, indent = 0) => {
+    const getCircularReplacer = () => {
+        const seen = new WeakSet();
+        return (key, value) => {
+            if (typeof value === "object" && value !== null) {
+                if (seen.has(value)) {
+                    return;
+                }
+                seen.add(value);
+            }
+            return value;
+        }
+    }
+
+    return JSON.stringify(obj, getCircularReplacer(), indent);
+}
+
 const mgr = new Oidc.UserManager(spaOidcConfig);
 
 const login = () => mgr.signinRedirect();
 const logout = () => mgr.signoutRedirect();
 
 const logUser = (user) => {
-    console.log(`--> User: ${JSON.stringify(user)}`);
+    console.log(`--> User: ${JSON.safeStringify(user)}`);
     return user;
 }
 
@@ -37,14 +54,14 @@ const showAwsCallerIdentity = (spaUser) => {
         return undefined;
     }
 
-    console.log(`--> AWS creds before: ${JSON.stringify(AWS.config.credentials)}`);
+    console.log(`--> AWS creds before: ${JSON.safeStringify(AWS.config.credentials)}`);
 
     AWS.config.credentials = new AWS.WebIdentityCredentials({
         RoleArn: 'arn:aws:iam::520400067019:role/aws_spa_oauth',
         WebIdentityToken: spaUser.id_token,
         RoleSessionName: spaUser.profile.email
     });
-    console.log(`--> AWS creds: ${JSON.stringify(AWS.config.credentials)}`);
+    console.log(`--> AWS creds: ${JSON.safeStringify(AWS.config.credentials)}`);
     // const awsOidcMgr = new Oidc.UserManager(awsOidcConfig);
 
     // awsOidcMgr.signinSilent().then(awsUser => {
@@ -62,13 +79,13 @@ const showAwsCallerIdentity = (spaUser) => {
         if (err) {
             console.error(err);
         } else {
-            console.log(`--> AWS creds2: ${JSON.stringify(AWS.config.credentials)}`);
+            console.log(`--> AWS creds2: ${JSON.safeStringify(AWS.config.credentials)}`);
             const sts = new AWS.STS();
             sts.getCallerIdentity({}, (err, data) => {
                 if (err) {
                     console.log(err, err.stack);
                 } else {
-                    awsInfo.innerHTML = JSON.stringify(data);
+                    awsInfo.innerHTML = JSON.safeStringify(data, 2);
                 }
             })
         }

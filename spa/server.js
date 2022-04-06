@@ -15,7 +15,8 @@ app.get('/oidc-config.js', (req, res) => {
         client_id: process.env['SPA_CLIENT_ID'],
         redirect_uri: `${process.env['BASE_URL']}/callback.html`,
         post_logout_redirect_uri: `${process.env['BASE_URL']}/`,
-        response_type: 'code'
+        response_type: 'code',
+        scope: "openid profile email"
     })
     const awsOidcConfig = JSON.stringify({
         authority: process.env['ISSUER_BASE_URL'],

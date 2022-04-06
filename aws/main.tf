@@ -4,15 +4,15 @@ provider "aws" {
 }
 
 resource "aws_iam_openid_connect_provider" "this" {
-  url  = var.oidc_issuer_base_url
+  url  = var.oidc_provider_url
   tags = var.tags
 
   client_id_list = [
-    "aws_spa"
+    var.oidc_client_id
   ]
 
   thumbprint_list = [
-    lower(var.oidc_issuer_thumbprint)
+    lower(var.oidc_provider_thumbprint)
   ]
 }
 
@@ -29,7 +29,7 @@ resource "aws_iam_role" "this" {
         "Action" : "sts:AssumeRoleWithWebIdentity",
         "Condition" : {
           "StringEquals" : {
-            "${replace(var.oidc_issuer_base_url, "https://", "")}:aud" : var.oidc_client_id
+            "${replace(var.oidc_provider_url, "https://", "")}:aud" : var.oidc_client_id
           }
         }
       }
