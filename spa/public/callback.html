@@ -7,7 +7,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/oidc-client/1.11.5/oidc-client.min.js"></script>
         <script src="oidc-config.js"></script>
         <script>
-            var mgr = new Oidc.UserManager(spaOidcConfig);
+            var mgr = new Oidc.UserManager(oidcConfig);
             mgr.signinRedirectCallback().then(() => {
                 console.log(`--> signinRedirectCallback done`);
                 window.location = "/";

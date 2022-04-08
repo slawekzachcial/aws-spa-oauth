@@ -6,9 +6,6 @@ console.log(`--> Using oidc-client version: ${Oidc.Version}`);
 AWS.config.region = 'us-east-1';
 // console.log(`Using AWS SDK version: XXX`);
 
-// spaOidcConfig.userStore = new Oidc.WebStorageStateStore({prefix: 'spaOidc.', store: Oidc.Global.sessionStore});
-// awsOidcConfig.userStore = new Oidc.WebStorageStateStore({prefix: 'awsOidc.', store: Oidc.Global.sessionStore});
-
 JSON.safeStringify = (obj, indent = 0) => {
     const getCircularReplacer = () => {
         const seen = new WeakSet();
@@ -26,7 +23,7 @@ JSON.safeStringify = (obj, indent = 0) => {
     return JSON.stringify(obj, getCircularReplacer(), indent);
 }
 
-const mgr = new Oidc.UserManager(spaOidcConfig);
+const mgr = new Oidc.UserManager(oidcConfig);
 
 const login = () => mgr.signinRedirect();
 const logout = () => mgr.signoutRedirect();
@@ -62,18 +59,6 @@ const showAwsCallerIdentity = (spaUser) => {
         RoleSessionName: spaUser.profile.email
     });
     console.log(`--> AWS creds: ${JSON.safeStringify(AWS.config.credentials)}`);
-    // const awsOidcMgr = new Oidc.UserManager(awsOidcConfig);
-
-    // awsOidcMgr.signinSilent().then(awsUser => {
-    //     console.log(`--> awsUser: ${awsUser}`);
-    //     AWS.config.credentials = new AWS.WebIdentityCredentials({
-    //         RoleArn: 'arn:aws:iam::520400067019:role/aws_spa_oauth',
-    //         WebIdentityToken: awsUser.access_token,
-    //         RoleSessionName: awsUser.profile.email
-    //     });
-    //     console.log(`--> AWS creds: ${JSON.stringify(AWS.config.credentials)}`);
-    // }).catch(console.error);
-
 
     AWS.config.credentials.get(err => {
         if (err) {
